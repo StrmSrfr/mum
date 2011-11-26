@@ -91,8 +91,10 @@
                                       (ps:@ icon coordinates 0)
                                       "-"
                                       (ps:@ icon coordinates 1)))
-                                (html (:abbr :title "TODO"
-                                             (ps:@ icon html))))))
+                                (html (ps:who-ps-html
+                                       (:abbr :title "Just this guy, you know?"
+                                              (ps:@ icon html)))
+                                       ))))
 
                   (defun update-handler (update)
                     (case (ps:@ update type)
