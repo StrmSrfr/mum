@@ -17,8 +17,8 @@
                (:file "action")
                (:file "icon")
                (:file "position-mixin")
-               (:file "turn" :depends-on ("package" "user"))
-               (:file "user" :depends-on ("package" "position-mixin"))
+               (:file "turn" :depends-on ("package" "player"))
+               (:file "player" :depends-on ("package" "position-mixin"))
                (:file "world" :depends-on ("package" "turn"))
                ))
 

@@ -22,12 +22,12 @@
 turn in the list is the turn currently being taken.
 If there is more than one turn in the list, there will be two, and the
 first turn in the list is the previous turn.
-Turns are destructively added to the end of this list, and users have
+Turns are destructively added to the end of this list, and players have
 their own list of turns they have not received yet, which will either be
 the same as this one or have it as a tail.")
-   (users
-    :accessor users
-    :initarg :users
+   (players
+    :accessor players
+    :initarg :players
     :initform nil
     :type list)
    ))
@@ -38,20 +38,20 @@ the same as this one or have it as a tail.")
 (defun current-turn (world)
   (car (turns world)))
 
-(defun ensure-user (world name &rest initargs &key &allow-other-keys )
-  (let ((user
-         (or (find name (users world) :key 'name :test #'string-equal)
-             (first (push (apply 'make-instance 'user
+(defun ensure-player (world name &rest initargs &key &allow-other-keys )
+  (let ((player
+         (or (find name (players world) :key 'name :test #'string-equal)
+             (first (push (apply 'make-instance 'player
                                  :name name
                                  :turns (turns world)
                                  initargs)
-                          (users world))))))
-    (ensure-user-turn-action (current-turn world) user)
-    user))
+                          (players world))))))
+    (ensure-player-turn-action (current-turn world) player)
+    player))
 
-(defun take-turn (world user action)
+(defun take-turn (world player action)
   (bordeaux-threads:with-lock-held ((turn-lock world))
-    (let ((turn-action (cdr (assoc user (actions (current-turn world))))))
+    (let ((turn-action (cdr (assoc player (actions (current-turn world))))))
       (eager-future2:force turn-action action)
       (when (every 'eager-future2:ready-to-yield?
                    (mapcar #'cdr
@@ -62,8 +62,8 @@ the same as this one or have it as a tail.")
   "Perform the actions and finish the turn.  Executed with the turn lock held."
   (let*((turn (current-turn world))
         (actions (reverse (actions turn))))
-    (mapcar (lambda (user action)
-              (perform-action world user turn action))
+    (mapcar (lambda (player action)
+              (perform-action world player turn action))
             (mapcar #'car actions)
             (mapcar 'eager-future2:yield
                     (mapcar #'cdr actions)))
@@ -71,7 +71,7 @@ the same as this one or have it as a tail.")
           (cdr (turns world)) (list
                                (make-instance 'turn
                                               :clock (incf (clock world))
-                                              :users (users turn)
+                                              :players (players turn)
                                               :actions (mapcar 'make-action-slot
                                                                (mapcar #'car
                                                                        (actions turn)))))

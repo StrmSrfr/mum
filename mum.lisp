@@ -21,25 +21,25 @@
         (:input :type "submit")))))
     s))
 
-(defun user-icon-json-alist (user)
+(defun player-icon-json-alist (player)
   "A helper function with a terrible name."
-  `((:coordinates . ,(coordinates user))
+  `((:coordinates . ,(coordinates player))
     (:html . ,(who-string
-               (:abbr :title (tooltip (icon user))
-                      (cl-who:str (glyph (icon user))))))))
+               (:abbr :title (tooltip (icon player))
+                      (cl-who:str (glyph (icon player))))))))
 
-(defun handle-action (user action-decoded-json)
+(defun handle-action (player action-decoded-json)
   (let ((verb (cdr (assoc :action action-decoded-json)))
         (arguments (cdr (assoc :arguments action-decoded-json))))
     (let ((action (make-action verb arguments)))
       (if (action-fully-specified-p action)
-        (take-turn *world* user action)
+        (take-turn *world* player action)
         (action-prompt action action)))))
 
 (define-easy-handler act ()
   (setf (hunchentoot:content-type*) "text/plain")
-  (let ((user (hunchentoot:session-value 'user)))
-    (handle-action user
+  (let ((player (hunchentoot:session-value 'user)))
+    (handle-action player
                    (json:decode-json-from-string
                     (caar (hunchentoot:post-parameters*))))
     (json:encode-json-to-string
@@ -47,18 +47,18 @@
         (:arguments . (,(clock *world*))))
        ((:type . "icons")
         (:arguments .
-                    ,(mapcar 'user-icon-json-alist
-                             (users *world*))))
-       ,@(loop while (done-p (first (turns user)))
+                    ,(mapcar 'player-icon-json-alist
+                             (players *world*))))
+       ,@(loop while (done-p (first (turns player)))
               append (mapcar (lambda (text)
                            `((:type . "message")
                              (:arguments . (,text))))
                          (mapcar #'cdr
-                                 (remove user (messages (pop (turns user))) :key #'car :test-not #'eq))))))))
+                                 (remove player (messages (pop (turns player))) :key #'car :test-not #'eq))))))))
 
 (define-easy-handler login (name)
-  (let ((user (ensure-user *world* name)))
-    (setf (hunchentoot:session-value 'user) user)
+  (let ((player (ensure-player *world* name)))
+    (setf (hunchentoot:session-value 'user) player)
     (hunchentoot:redirect "/mum/view")))
 
 (hunchentoot:define-easy-handler (view :uri "/mum/view") ()

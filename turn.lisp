@@ -8,8 +8,8 @@
     :initarg :actions
     :initform nil
     :type list
-    :documentation "Alist of users to action futures.  Stored in reverse
-order of turn priority (i.e., the first user in this list goes last).")
+    :documentation "Alist of players to action futures.  Stored in reverse
+order of turn priority (i.e., the first player in this list goes last).")
    (done-p
     :accessor done-p
     :initarg :done-p
@@ -24,35 +24,35 @@ order of turn priority (i.e., the first user in this list goes last).")
     :initarg :messages
     :initform nil
     :type list
-    :documentation "Alist of users to textual messages displayed to them
+    :documentation "Alist of players to textual messages displayed to them
 when this turn ends.  Stored in reverse order (last message displayed is first in list).")
-   (users
-    :accessor users
-    :initarg :users
+   (players
+    :accessor players
+    :initarg :players
     :initform nil
     :type list
-    :documentation "Users participating in this turn.")
+    :documentation "Players participating in this turn.")
     ))
 
 (defun never ()
   (error "You tried to compute this future but it should be computed externally."))
 
-(defun make-action-slot (user)
-  (cons user (eager-future2:pcall 'never :lazy)))
+(defun make-action-slot (player)
+  (cons player (eager-future2:pcall 'never :lazy)))
 
-(defun ensure-user-turn-action (turn user)
+(defun ensure-player-turn-action (turn player)
   (declare (type turn turn)
-           (type user user))
-  (pushnew user
-           (users turn)
+           (type player player))
+  (pushnew player
+           (players turn)
            :key 'name
            :test 'string=)
-  (or (assoc user (actions turn))
-      (first (push (make-action-slot user)
+  (or (assoc player (actions turn))
+      (first (push (make-action-slot player)
                    (actions turn)))))
 
-(defun message-all-users (turn message)
-  (mapcar (lambda (user)
-            (push (cons user message)
+(defun message-all-players (turn message)
+  (mapcar (lambda (player)
+            (push (cons player message)
                   (messages turn)))
-   (users turn)))
+   (players turn)))

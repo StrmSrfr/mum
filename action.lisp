@@ -33,12 +33,12 @@ representing an unrecognized action.")
 (defun action-fully-specified-p (action)
   (action-fully-specified-p-2 (verb action) (arguments action)))
 
-(defgeneric action-prompt-3 (user verb arguments))
+(defgeneric action-prompt-3 (player verb arguments))
 
-(defun action-prompt (action user)
-  (action-prompt-3 user (verb action) (arguments action)))
+(defun action-prompt (action player)
+  (action-prompt-3 player (verb action) (arguments action)))
 
-(defmethod action-prompt-3 (user verb arguments)
+(defmethod action-prompt-3 (player verb arguments)
   "You wanna what with a what!?")
 
 (defmethod action-fully-specified-p-2 (verb arguments)
@@ -49,10 +49,10 @@ representing an unrecognized action.")
   (> (length arguments) 0))
 
 
-(defgeneric perform-action-5 (world user turn verb arguments))
+(defgeneric perform-action-5 (world player turn verb arguments))
 
-(defun perform-action (world user turn action)
-  (perform-action-5 world user turn (verb action) (arguments action)))
+(defun perform-action (world player turn action)
+  (perform-action-5 world player turn (verb action) (arguments action)))
 
-(defmethod perform-action-5 (world user turn (verb (eql :talk)) (arguments list))
-  (message-all-users turn (format nil "~A says \"~A\"." (name user) (first arguments))))
+(defmethod perform-action-5 (world player turn (verb (eql :talk)) (arguments list))
+  (message-all-players turn (format nil "~A says \"~A\"." (name player) (first arguments))))
