@@ -28,7 +28,9 @@
 (defun user-icon-json-alist (user)
   "A helper function with a terrible name."
   `((:coordinates . ,(coordinates user))
-    (:html . ,(glyph (icon user)))))
+    (:html . ,(who-string
+               (:abbr :title (tooltip (icon user))
+                      (cl-who:str (glyph (icon user))))))))
 
 (defmacro string-case (key &body cases)
   `(alexandria:switch (,key :test 'equal)
@@ -91,10 +93,7 @@
                                       (ps:@ icon coordinates 0)
                                       "-"
                                       (ps:@ icon coordinates 1)))
-                                (html (ps:who-ps-html
-                                       (:abbr :title "Just this guy, you know?"
-                                              (ps:@ icon html)))
-                                       ))))
+                                (html (ps:@ icon html)))))
 
                   (defun update-handler (update)
                     (case (ps:@ update type)

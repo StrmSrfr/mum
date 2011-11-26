@@ -12,7 +12,8 @@
                #:bordeaux-threads
                )
   :components ((:file "package")
-               (:file "mum" :depends-on ("package" "world"))
+               (:file "macros" :depends-on ("package"))
+               (:file "mum" :depends-on ("package" "macros" "world"))
                (:file "action")
                (:file "icon")
                (:file "position-mixin")

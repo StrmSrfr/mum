@@ -5,7 +5,10 @@
 (defclass icon ()
   ((glyph
    :accessor glyph
-   :initarg :glyph)))
+   :initarg :glyph)
+   (tooltip
+    :accessor tooltip
+    :initarg :tooltip)))
 
-(defvar +player-icon+
-  (make-instance 'icon :glyph "p"))
+(defparameter +player-icon+
+  (make-instance 'icon :glyph "p" :tooltip "somebody"))
