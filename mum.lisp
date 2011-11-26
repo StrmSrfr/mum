@@ -3,7 +3,7 @@
 (in-package #:mum)
 
 (defvar *acceptor*
-  (hunchentoot:start (make-instance 'hunchentoot:acceptor :port 13013)))
+  (hunchentoot:start (make-instance 'hunchentoot:easy-acceptor :port 13013)))
 
 (hunchentoot:define-easy-handler (index :uri "/mum/") ()
   (setf (hunchentoot:content-type*) "text/html")
