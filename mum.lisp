@@ -5,10 +5,6 @@
 (defvar *acceptor*
   (hunchentoot:start (make-instance 'hunchentoot:acceptor :port 13013)))
 
-(defmacro define-easy-handler (name (&rest args) &rest body)
-  `(hunchentoot:define-easy-handler (,name :uri ,(concatenate 'string "/mum/" (string-downcase name))) ,args
-     ,@body))
-
 (hunchentoot:define-easy-handler (index :uri "/mum/") ()
   (setf (hunchentoot:content-type*) "text/html")
   (cl-who:with-html-output-to-string (s)
@@ -31,10 +27,6 @@
     (:html . ,(who-string
                (:abbr :title (tooltip (icon user))
                       (cl-who:str (glyph (icon user))))))))
-
-(defmacro string-case (key &body cases)
-  `(alexandria:switch (,key :test 'equal)
-     ,@cases))
 
 (defun handle-action (user action-decoded-json)
   (let ((verb (cdr (assoc :action action-decoded-json)))
