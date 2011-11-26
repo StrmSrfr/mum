@@ -1,0 +1,14 @@
+The fundamental concept of mum is the TURN, representing a region of
+space-time.
+
+Each TURN involves one or more PLAYERs (characters controlled by
+humans or AI) in exactly one ARENA.
+
+During the TURN each PLAYER takes one ACTION (slowed players might be
+forced to take a specific action on turns that they can't move in?).
+After all players have chosen their action, effects happen and the
+TURN is considered DONE and another turn begins.
+
+Each PLAYER and ARENA is associated with one TURN that is not DONE at
+any given time.  PLAYERs have access to completed TURNs that the
+client hasn't seen yet, but they can't be modified.
