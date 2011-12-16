@@ -17,5 +17,11 @@
     :initarg :turns
     :initform nil
     :type list
-    :documentation "Turns this player hasn't seen yet.")))
+    :documentation "Turns this player hasn't seen yet.  The last turn in
+the list is the turn currently being taken.")))
+
+(defmethod print-object ((player player) stream)
+  (print-unreadable-object (player stream :type t :identity t)
+    (format stream "~S" (name player))))
+
 

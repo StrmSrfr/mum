@@ -16,8 +16,12 @@ representing an unrecognized action.")
     :type list))
   (:documentation "taken during a turn"))
 
+(defmethod print-object ((action action) stream)
+  (print-unreadable-object (action stream :type t :identity t)
+    (format stream "~S ~S" (verb action) (arguments action))))
+
 (defparameter *action-verbs*
-  '(:talk :move)
+  '(:talk :move :stay)
   "All recognized action verbs.")
 
 (defun make-action (verb arguments)
@@ -48,6 +52,10 @@ representing an unrecognized action.")
   "One argument: the text."
   (> (length arguments) 0))
 
+(defmethod action-fully-specified-p-2 ((verb (eql :stay)) (arguments list))
+  "No arguments."
+  t)
+
 
 (defgeneric perform-action-5 (world player turn verb arguments))
 
@@ -55,4 +63,8 @@ representing an unrecognized action.")
   (perform-action-5 world player turn (verb action) (arguments action)))
 
 (defmethod perform-action-5 (world player turn (verb (eql :talk)) (arguments list))
-  (message-all-players turn (format nil "~A says \"~A\"." (name player) (first arguments))))
+  (message-all-players turn (format nil "~A says \"~A\". (clock ~D)" (name player) (first arguments) (clock turn))))
+
+(defmethod perform-action-5 (world player turn (verb (eql :stay)) (arguments list))
+  ; nop
+  )

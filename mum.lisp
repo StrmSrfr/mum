@@ -30,11 +30,18 @@
 
 (defun handle-action (player action-decoded-json)
   (let ((verb (cdr (assoc :action action-decoded-json)))
-        (arguments (cdr (assoc :arguments action-decoded-json))))
-    (let ((action (make-action verb arguments)))
+        (arguments (cdr (assoc :arguments action-decoded-json)))
+        (clock (cdr (assoc :clock action-decoded-json))))
+    (let ((action (make-action verb arguments))
+          (turn (or
+                 (find clock (turns player) :key 'clock :from-end t)
+                 (and (zerop clock) (first (last (turns player)))))))
       (if (action-fully-specified-p action)
-        (take-turn *world* player action)
-        (action-prompt action action)))))
+          (if turn
+              (take-turn turn player action)
+              (error "turn not found"); TODO
+              )
+          (action-prompt action action)))))
 
 (define-easy-handler act ()
   (setf (hunchentoot:content-type*) "text/plain")
@@ -43,8 +50,7 @@
                    (json:decode-json-from-string
                     (caar (hunchentoot:post-parameters*))))
     (json:encode-json-to-string
-     `(((:type . "clock")
-        (:arguments . (,(clock *world*))))
+     `(
        ((:type . "icons")
         (:arguments .
                     ,(mapcar 'player-icon-json-alist
@@ -53,8 +59,12 @@
               append (mapcar (lambda (text)
                            `((:type . "message")
                              (:arguments . (,text))))
-                         (mapcar #'cdr
-                                 (remove player (messages (pop (turns player))) :key #'car :test-not #'eq))))))))
+                         (reverse
+                          (mapcar #'cdr
+                                 (remove player (messages (pop (turns player))) :key #'car :test-not #'eq)))))
+      ((:type . "clock")
+       (:arguments . (,(clock (first (last (turns player)))))))
+       ))))
 
 (define-easy-handler login (name)
   (let ((player (ensure-player *world* name)))
@@ -63,7 +73,7 @@
 
 (hunchentoot:define-easy-handler (view :uri "/mum/view") ()
   (setf (hunchentoot:content-type*) "text/html")
-  (cl-who:with-html-output-to-string (s)
+  (who-string
     (:html
      (:head
       (:title "mum: multi-user mum")
@@ -79,6 +89,8 @@
       (:script :type "text/javascript"
                (cl-who:str
                 (parenscript:ps
+                  (defvar *clock* 0)
+
                   (defun draw-icon (icon)
                     (when (= 0 (ps:@ icon coordinates 2))
                       (ps:chain ($ (+ "#char-"
@@ -87,36 +99,53 @@
                                       (ps:@ icon coordinates 1)))
                                 (html (ps:@ icon html)))))
 
-                  (defun update-handler (update)
+                  (defun update-handler (update old-action old-arguments old-clock)
+                    "The action, arguments, and clock  are those that were taken
+which initiated this update."
                     (case (ps:@ update type)
                       (:message
                        (ps:chain ($ "#messages")
                               (append (+ "<p>" (ps:@ update :arguments 0)
                                          "</p>"))))
                       (:clock
-                       (ps:chain ($ "#clock")
-                                 (html (ps:@ update :arguments 0))))
+                       (let ((clock (ps:@ update :arguments 0)))
+                         (if (or (= clock *clock*) (= *clock* 0))
+                           (set-timeout (lambda ()
+                                          (act old-action old-arguments old-clock))
+                                        1000)
+                           (ps:chain ($ ".action")
+                                     (attr "disabled" ps:f)))
+                         (ps:chain ($ "#clock")
+                                   (html clock))
+                         (setf *clock* clock)))
                       (:icons
                        ;; TODO just add them for now; later we'll have to deal with clearing the old ones
                        (mapcar #'draw-icon
                                (ps:@ update :arguments))
                        )))
 
-                  (defun new-turn-handler (data)
+                  (defun new-turn-handler (data old-action old-arguments old-clock)
                     (ps:chain $
                            (each (ps:chain *JSON*
                                         (parse data))
                                  (lambda (index value)
-                                   (update-handler value)))))
+                                   (update-handler value old-action old-arguments old-clock)))))
 
-                  (defun act (action arguments)
+                  (defun act (action args clock)
+                    (ps:chain ($ ".action")
+                              (attr "disabled" t))
+                    (unless clock
+                      (setf clock *clock*))
                     (ps:chain $
                               (post "act"
                                     (ps:chain *JSON*
                                               (stringify
                                                (ps:create :action action
-                                                          :arguments arguments)))
-                                    #'new-turn-handler
+                                                          :arguments args
+                                                          :clock *clock*)))
+                                    (let ((old-clock *clock*))
+                                      (lambda (data)
+                                        (new-turn-handler data action args old-clock)))
                                     )))
 
                   (defun move (direction)
@@ -157,19 +186,18 @@
        (:div
         (:form :id "talkbox"
                (:input :type "text" :id "talktext" :size 60 :name "chat")
-               (:input :type "submit" :value "Chat")))
+               (:input :type "submit" :value "Chat" :class "action")))
        (:div
         (:form :id "movebox"
                (:table
-                (:tr (:td (:input :type "button" :id "move-nw" :value "NW"))
-                     (:td (:input :type "button" :id "move-n" :value "N"))
-                     (:td (:input :type "button" :id "move-ne" :value "NE")))
-                (:tr (:td (:input :type "button" :id "move-w" :value "W"))
-                     (:td (:input :type "button" :id "stay" :value "."))
-                     (:td (:input :type "button" :id "move-e" :value "E")))
-                (:tr (:td (:input :type "button" :id "move-sw" :value "SW"))
-                     (:td (:input :type "button" :id "move-s" :value "S"))
-                     (:td (:input :type "button" :id "move-se" :value "SE"))))))
-       )))
-    s))
+                (:tr (:td (:input :type "button" :id "move-nw" :value "NW" :class "action"))
+                     (:td (:input :type "button" :id "move-n" :value "N" :class "action"))
+                     (:td (:input :type "button" :id "move-ne" :value "NE" :class "action")))
+                (:tr (:td (:input :type "button" :id "move-w" :value "W" :class "action"))
+                     (:td (:input :type "button" :id "stay" :value "." :class "action"))
+                     (:td (:input :type "button" :id "move-e" :value "E" :class "action")))
+                (:tr (:td (:input :type "button" :id "move-sw" :value "SW" :class "action"))
+                     (:td (:input :type "button" :id "move-s" :value "S" :class "action"))
+                     (:td (:input :type "button" :id "move-se" :value "SE" :class "action"))))))
+       )))))
 
