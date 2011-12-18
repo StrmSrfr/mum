@@ -200,5 +200,11 @@ which initiated this update."
                 (:tr (:td (:input :type "button" :id "move-sw" :value "SW" :class "action"))
                      (:td (:input :type "button" :id "move-s" :value "S" :class "action"))
                      (:td (:input :type "button" :id "move-se" :value "SE" :class "action"))))))
+       (:script :type "text/javascript"; TOOD: move this to a proper test suite
+		(cl-who:str
+		 (parenscript:ps
+		   (when (not (member 1 '(1 2 3)))
+		     (ps:chain document
+			       (write "Attention mum installer: your parenscript has a buggy 'member'."))))))
        ))))))
 
