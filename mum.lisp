@@ -73,6 +73,7 @@
 
 (hunchentoot:define-easy-handler (view :uri "/mum/view") ()
   (setf (hunchentoot:content-type*) "text/html")
+  (let ((user (hunchentoot:session-value 'user)))
   (who-string
     (:html
      (:head
@@ -89,7 +90,7 @@
       (:script :type "text/javascript"
                (cl-who:str
                 (parenscript:ps
-                  (defvar *clock* 0)
+                  (defvar *clock* (ps:lisp (clock user)))
 
                   (defun draw-icon (icon)
                     (when (= 0 (ps:@ icon coordinates 2))
@@ -109,7 +110,7 @@ which initiated this update."
                                          "</p>"))))
                       (:clock
                        (let ((clock (ps:@ update :arguments 0)))
-                         (if (or (= clock *clock*) (= *clock* 0))
+                         (if (= clock *clock*)
                            (set-timeout (lambda ()
                                           (act old-action old-arguments old-clock))
                                         1000)
@@ -172,7 +173,7 @@ which initiated this update."
       (:div
        (:p "Name: "
            (cl-who:str (name
-                        (hunchentoot:session-value 'user))))
+                        user)))
        (:p :id "clock")
        (:div
         (:table :id "viewport"
@@ -199,5 +200,5 @@ which initiated this update."
                 (:tr (:td (:input :type "button" :id "move-sw" :value "SW" :class "action"))
                      (:td (:input :type "button" :id "move-s" :value "S" :class "action"))
                      (:td (:input :type "button" :id "move-se" :value "SE" :class "action"))))))
-       )))))
+       ))))))
 

@@ -24,4 +24,6 @@ the list is the turn currently being taken.")))
   (print-unreadable-object (player stream :type t :identity t)
     (format stream "~S" (name player))))
 
+(defmethod clock ((player player))
+  (clock (first (last (turns player)))))
 

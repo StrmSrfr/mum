@@ -40,7 +40,18 @@ when this turn ends.  Stored in reverse order (last message displayed is first i
 
 (defmethod print-object ((turn turn) stream)
   (print-unreadable-object (turn stream :type t :identity t)
-    (format stream "~S ~S" (arena turn) (clock turn))))
+    (format stream "~S ~S ~%  ~S" (arena turn) (clock turn)
+	    (actions turn))))
+
+(defvar *all-turns*
+  nil
+  "A list of all turns, ever, for debugging purposes.  This must go
+  away so that they can be garbage collected at some point in the
+  future.")
+
+(defmethod initialize-instance :after ((instance turn) &rest initargs)
+  (push instance *all-turns*))
+  
 
 (defun make-next-turn (turn)
   (let ((arena (arena turn))
@@ -100,8 +111,9 @@ when this turn ends.  Stored in reverse order (last message displayed is first i
   (bordeaux-threads:with-lock-held ((turn-lock *world*))
     (let ((turn-action (cdr (assoc player (actions turn)))))
       (eager-future2:force turn-action action)
-      (when (every 'eager-future2:ready-to-yield?
+      (when (and (not (done-p turn))
+		 (every 'eager-future2:ready-to-yield?
                    (mapcar #'cdr
-                           (actions turn)))
+                           (actions turn))))
         (finish-turn turn)))))
 
