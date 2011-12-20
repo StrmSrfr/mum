@@ -62,8 +62,14 @@
                          (reverse
                           (mapcar #'cdr
                                  (remove player (messages (pop (turns player))) :key #'car :test-not #'eq)))))
-      ((:type . "clock")
-       (:arguments . (,(clock (first (last (turns player)))))))
+      ((:type . "clock"); N.B. must be run after messages loop
+       (:arguments . (,(clock (first (turns player))))))
+      ((:type . "stragglers"); N.B. must be run after messages loop
+       (:arguments ,(mapcar 'name
+			    (mapcar #'car
+				    (remove-if 'eager-future2:ready-to-yield?
+					       (actions (first (turns player))); waiting turn
+					       :key #'cdr)))))
        ))))
 
 (define-easy-handler login (name)
@@ -119,6 +125,16 @@ which initiated this update."
                          (ps:chain ($ "#clock")
                                    (html clock))
                          (setf *clock* clock)))
+		      (:stragglers
+		       (let*((stragglers (ps:@ update :arguments 0))
+			     (stragglers-string
+			      (if (member (ps:lisp (name user)) stragglers)
+				  "you!"
+				  (ps:chain stragglers
+					    (join ", ")))))
+			 (ps:chain ($ "#stragglers")
+				   (html 
+				    stragglers-string))))
                       (:icons
                        ;; TODO just add them for now; later we'll have to deal with clearing the old ones
                        (mapcar #'draw-icon
@@ -174,6 +190,9 @@ which initiated this update."
        (:p "Name: "
            (cl-who:str (name
                         user)))
+       (:p "Waiting on: "
+	   (:span :id "stragglers"
+		  "computers"))
        (:p :id "clock")
        (:div
         (:table :id "viewport"
