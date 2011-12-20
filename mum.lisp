@@ -99,13 +99,26 @@
                 (parenscript:ps
                   (defvar *clock* (ps:lisp (clock user)))
 
+		  (defvar *icons* (list))
+
+		  (defun coordinate-id (coordinates)
+		    (+ "#char-"
+		       (ps:@ coordinates 0)
+		       "-"
+		       (ps:@ coordinates 1)))
+
                   (defun draw-icon (icon)
                     (when (= 0 (ps:@ icon coordinates 2))
-                      (ps:chain ($ (+ "#char-"
-                                      (ps:@ icon coordinates 0)
-                                      "-"
-                                      (ps:@ icon coordinates 1)))
-                                (html (ps:@ icon html)))))
+		      (let ((id (coordinate-id (ps:@ icon coordinates))))
+			(setf (ps:@ icon old-html)
+			      (ps:chain ($ id)
+					(html)))
+			(ps:chain ($ id)
+				  (html (ps:@ icon html))))))
+
+		  (defun undraw-icon (icon)
+		    (ps:chain ($ (coordinate-id (ps:@ icon coordinates)))
+			      (html (ps:@ icon old-html))))
 
                   (defun update-handler (update old-action old-arguments old-clock)
                     "The action, arguments, and clock  are those that were taken
@@ -137,10 +150,11 @@ which initiated this update."
 				   (html 
 				    stragglers-string))))
                       (:icons
-                       ;; TODO just add them for now; later we'll have to deal with clearing the old ones
-                       (mapcar #'draw-icon
-                               (ps:@ update :arguments))
-                       )))
+		       (let ((icons (ps:@ update :arguments)))
+			 (mapcar #'undraw-icon *icons*)
+			 (setf *icons* icons)
+			 (mapcar #'draw-icon icons)))
+                       ))
 
                   (defun new-turn-handler (data old-action old-arguments old-clock)
                     (ps:chain $
