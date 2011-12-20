@@ -24,12 +24,20 @@ representing an unrecognized action.")
   '(:talk :move :stay)
   "All recognized action verbs.")
 
+(defun quasi-intern (string-designator symbol-list)
+  "Returns the symbol from the SYMBOL-LIST that is STRING-EQUAL to the
+  STRING-DESIGNATOR, or an uninterned symbol if no such symbol is
+  found.  STRING-UPCASE is called on the string designator if a symbol
+  is made from it."
+  (or (find string-designator symbol-list
+	    :test #'string-equal)
+      (make-symbol (string-upcase string-designator))))
+
 (defun make-action (verb arguments)
   (declare (type string verb)
            (type list arguments))
   (make-instance 'action
-                 :verb (or (find verb *action-verbs* :test 'string-equal)
-                           (make-symbol (string-upcase verb)))
+                 :verb (quasi-intern verb *action-verbs*)
                  :arguments arguments))
 
 (defgeneric action-fully-specified-p-2 (verb arguments))
@@ -48,6 +56,25 @@ representing an unrecognized action.")
 (defmethod action-fully-specified-p-2 (verb arguments)
   nil)
 
+(defvar *directions*
+  '((:SW . (-1  1 0))
+    (:S  . ( 0  1 0))
+    (:SE . ( 1  1 0))
+    (:W  . (-1  0 0))
+    (:E  . ( 1  0 0))
+    (:NW . (-1 -1 0))
+    (:N  . ( 0 -1 0))
+    (:NE . ( 1 -1 0))))
+
+(defmethod action-fully-specified-p-2 ((verb (eql :move)) (arguments list))
+  "One argument: the direction.  Must be in *DIRECTIONS*."
+  (and
+   (= (length arguments) 1)
+   (let ((dir (quasi-intern (first arguments)
+			    (mapcar #'car *directions*))))
+     (assoc dir
+	    *directions*))))
+
 (defmethod action-fully-specified-p-2 ((verb (eql :talk)) (arguments list))
   "One argument: the text."
   (> (length arguments) 0))
@@ -61,6 +88,14 @@ representing an unrecognized action.")
 
 (defun perform-action (world player turn action)
   (perform-action-5 world player turn (verb action) (arguments action)))
+
+(defmethod perform-action-5 (world player turn (verb (eql :move)) (arguments list))
+  (setf (coordinates player)
+	(mapcar #'+
+		(coordinates player)
+		(cdr (assoc (quasi-intern (first arguments)
+					  (mapcar #'car *directions*))
+			    *directions*)))))
 
 (defmethod perform-action-5 (world player turn (verb (eql :talk)) (arguments list))
   (message-all-players turn (format nil "~A says \"~A\". (clock ~D)" (name player) (first arguments) (clock turn))))
