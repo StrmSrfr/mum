@@ -8,7 +8,7 @@
    :initarg :name)
    (icon
     :accessor icon
-    :initarg icon
+    :initarg :icon
     :initform +player-icon+)
    (coordinates; inherited from position-mixin
     :initform (list (1+ (random 79)) (1+ (random 23)) 0))

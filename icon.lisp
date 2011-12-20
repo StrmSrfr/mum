@@ -3,7 +3,11 @@
 (in-package #:mum)
 
 (defclass icon ()
-  ((glyph
+  ((color
+    :accessor color
+    :initarg :color
+    :documentation "Icon color as CSS string")
+   (glyph
    :accessor glyph
    :initarg :glyph)
    (tooltip
@@ -12,3 +16,30 @@
 
 (defparameter +player-icon+
   (make-instance 'icon :glyph "p" :tooltip "somebody"))
+
+(defun string-hash-color (string)
+  (let ((result-gbr (make-array 3 :initial-element 128)))
+    (loop for c across string
+	 for stim in (alexandria:circular-list 0 1 2)
+	 for index from 0
+	 do (let ((val (digit-char-p c 36)))
+	      (when val
+		(let*((acc (aref result-gbr stim))
+		      (room (- 256.0 acc))
+		      (inc (/ room 36.0))
+		      (del (- (* val inc)
+			      (/ room 2.0))))
+		  (setf (aref result-gbr stim)
+			(+ acc del))))))
+    (loop for e across result-gbr
+       collect (floor e))))
+
+(defun string-hash-color-rgb (string)
+  (let ((gbr (string-hash-color string)))
+    (format nil "rgb(~D,~D,~D)"
+	    (elt gbr 2)
+	    (elt gbr 0)
+	    (elt gbr 1))))
+			 
+			 
+  

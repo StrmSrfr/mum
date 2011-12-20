@@ -26,6 +26,7 @@
   `((:coordinates . ,(coordinates player))
     (:html . ,(who-string
                (:abbr :title (tooltip (icon player))
+		      :style (format nil "color: ~A" (color (icon player)))
                       (cl-who:str (glyph (icon player))))))))
 
 (defun handle-action (player action-decoded-json)
