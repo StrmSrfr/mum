@@ -151,6 +151,8 @@ which initiated this update."
                   (defun act (action args clock)
                     (ps:chain ($ ".action")
                               (attr "disabled" t))
+		    (ps:chain ($ "#messages")
+			      (html ""))
                     (unless clock
                       (setf clock *clock*))
                     (ps:chain $
