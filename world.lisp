@@ -26,6 +26,11 @@
         (let ((player
                (first (push (apply 'make-instance 'player
                                    :name name
+				   ; TODO place this better
+				   :icon (make-instance 'icon
+							:tooltip name
+							:glyph "p"
+							:color (string-hash-color-rgb name))
                                    initargs)
                             (players world)))))
           (ensure-player *valhalla* player)))))
