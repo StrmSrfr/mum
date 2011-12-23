@@ -82,11 +82,14 @@ when this turn ends.  Stored in reverse order (last message displayed is first i
                 (append (turns player)
                         (list turn)))))))
 
+(defun message-player (player turn message)
+  (push (cons player message)
+	(messages turn)))
+
 (defun message-all-players (turn message)
   (mapcar (lambda (player)
-            (push (cons player message)
-                  (messages turn)))
-   (players turn)))
+	    (message-player player turn message))
+	  (players turn)))
 
 (defun finish-turn (turn)
   "Perform the actions and finish the turn.  Executed with the turn lock held."

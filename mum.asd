@@ -17,6 +17,7 @@
                (:file "mum" :depends-on ("package" "macros" "world"))
                (:file "action" :depends-on ("package"))
                (:file "arena" :depends-on ("package" "generics"))
+	       (:file "collision" :depends-on ("package"))
                (:file "icon" :depends-on ("package"))
                (:file "position-mixin" :depends-on ("package"))
                (:file "turn" :depends-on ("package" "generics" "player"))

@@ -61,6 +61,7 @@ representing an unrecognized action.")
     (:S  . ( 0  1 0))
     (:SE . ( 1  1 0))
     (:W  . (-1  0 0))
+    (:.  . ( 0  0 0))
     (:E  . ( 1  0 0))
     (:NW . (-1 -1 0))
     (:N  . ( 0 -1 0))
@@ -90,12 +91,14 @@ representing an unrecognized action.")
   (perform-action-5 world player turn (verb action) (arguments action)))
 
 (defmethod perform-action-5 (world player turn (verb (eql :move)) (arguments list))
-  (setf (coordinates player)
-	(mapcar #'+
-		(coordinates player)
-		(cdr (assoc (quasi-intern (first arguments)
-					  (mapcar #'car *directions*))
-			    *directions*)))))
+  (let ((direction (quasi-intern (first arguments)
+				 (mapcar #'car *directions*))))
+    (setf (coordinates player)
+	  (mapcar #'+
+		  (coordinates player)
+		  (cdr (assoc direction
+			      *directions*))))
+    (collide player (arena turn) direction turn)))
 
 (defmethod perform-action-5 (world player turn (verb (eql :talk)) (arguments list))
   (message-all-players turn (format nil "~A says \"~A\". (clock ~D)" (name player) (first arguments) (clock turn))))
