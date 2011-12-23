@@ -6,6 +6,7 @@
   ((color
     :accessor color
     :initarg :color
+    :initform "white"
     :documentation "Icon color as CSS string")
    (glyph
    :accessor glyph
@@ -16,6 +17,9 @@
 
 (defparameter +player-icon+
   (make-instance 'icon :glyph "p" :tooltip "somebody"))
+
+(defparameter +wall-icon+
+  (make-instance 'icon :glyph "#" :tooltip "a wall"))
 
 (defun string-hash-color (string)
   (let ((result-gbr (make-array 3 :initial-element 128)))

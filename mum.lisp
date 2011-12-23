@@ -21,13 +21,13 @@
         (:input :type "submit")))))
     s))
 
-(defun player-icon-json-alist (player)
+(defun icon-json-alist (icon-mixin)
   "A helper function with a terrible name."
-  `((:coordinates . ,(coordinates player))
+  `((:coordinates . ,(coordinates icon-mixin))
     (:html . ,(who-string
-               (:abbr :title (tooltip (icon player))
-		      :style (format nil "color: ~A" (color (icon player)))
-                      (cl-who:str (glyph (icon player))))))))
+               (:abbr :title (tooltip (icon icon-mixin))
+		      :style (format nil "color: ~A" (color (icon icon-mixin)))
+                      (cl-who:str (glyph (icon icon-mixin))))))))
 
 (defun handle-action (player action-decoded-json)
   (let ((verb (cdr (assoc :action action-decoded-json)))
@@ -54,8 +54,8 @@
      `(
        ((:type . "icons")
         (:arguments .
-                    ,(mapcar 'player-icon-json-alist
-                             (players *world*))))
+                    ,(mapcar 'icon-json-alist
+                             (icons (arena (first (last (turns player))))))))
        ,@(loop while (done-p (first (turns player)))
               append (mapcar (lambda (text)
                            `((:type . "message")

@@ -11,7 +11,13 @@
     :accessor players
     :initarg :players
     :initform nil
+    :type list
     :documentation "Players in this arena.")
+   (walls
+    :accessor walls
+    :initarg :walls
+    :initform nil
+    :type list)
    (turn
     :accessor turn
     :initarg :turn
@@ -23,9 +29,23 @@
   (print-unreadable-object (arena stream :type t :identity t)
     (format stream "~S" (name arena))))
 
+(defmethod icons ((arena arena))
+  (append (players arena) (walls arena)))
+
+(defun make-valhalla ()
+  (let ((valhalla (make-instance 'arena
+				:name "Valhalla")))
+    (loop for y from 1 to 24
+       do (loop for x from 1 to 80
+	     when (or (member x '(1 80))
+		      (member y '(1 24)))
+	     do (push (make-instance 'wall
+				     :coordinates (list x y 0))
+		      (walls valhalla))))
+    valhalla))
+
 (defvar *valhalla*
-  (make-instance 'arena
-                 :name "Valhalla"))
+  (make-valhalla))
 
 (defmethod ensure-player ((arena arena) (player player) &rest ignored?)
   (the player

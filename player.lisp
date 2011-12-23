@@ -2,7 +2,7 @@
 
 (in-package #:mum)
 
-(defclass player (position-mixin)
+(defclass player (icon-mixin)
   ((name
    :accessor name
    :initarg :name)
