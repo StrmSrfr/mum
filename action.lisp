@@ -21,7 +21,7 @@ representing an unrecognized action.")
     (format stream "~S ~S" (verb action) (arguments action))))
 
 (defparameter *action-verbs*
-  '(:talk :move :stay)
+  '(:talk :move :stay :proxiport)
   "All recognized action verbs.")
 
 (defun quasi-intern (string-designator symbol-list)
@@ -76,6 +76,10 @@ representing an unrecognized action.")
      (assoc dir
 	    *directions*))))
 
+(defmethod action-fully-specified-p-2 ((verb (eql :proxiport)) (arguments list))
+  "No arguments."
+  t)
+
 (defmethod action-fully-specified-p-2 ((verb (eql :talk)) (arguments list))
   "One argument: the text."
   (> (length arguments) 0))
@@ -99,6 +103,15 @@ representing an unrecognized action.")
 		  (cdr (assoc direction
 			      *directions*))))
     (collide player (arena turn) direction turn)))
+
+(defmethod perform-action-5 (world player turn (verb (eql :proxiport)) (arguments list))
+  "A random short-range teleport."
+  (setf (coordinates player)
+	(list (+ (random 20) -10
+		 (first (coordinates player)))
+	      (+ (random 20) -10
+		 (second (coordinates player)))
+	      (third (coordinates player)))))
 
 (defmethod perform-action-5 (world player turn (verb (eql :talk)) (arguments list))
   (message-all-players turn (format nil "~A says \"~A\". (clock ~D)" (name player) (first arguments) (clock turn))))

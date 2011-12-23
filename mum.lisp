@@ -200,8 +200,12 @@ which initiated this update."
                                  (ps:chain ($ "#movebox table tr td input")
                                           (click (lambda ()
                                                     (move (ps:chain ($ this) (val)))
-                                                    false)))))))
-                )))
+                                                    false)))
+				 (ps:chain ($ "#spellbox input")
+					   (click (lambda ()
+						    (act (ps:chain ($ this) (val)) ())
+						    false))))))
+                ))))
      (:body
       (:div
        (:p "Name: "
@@ -225,7 +229,7 @@ which initiated this update."
                (:input :type "text" :id "talktext" :size 60 :name "chat")
                (:input :type "submit" :value "Chat" :class "action")))
        (:div
-        (:form :id "movebox"
+        (:form :id "movebox" :style "float: left"
                (:table
                 (:tr (:td (:input :type "button" :id "move-nw" :value "NW" :class "action"))
                      (:td (:input :type "button" :id "move-n" :value "N" :class "action"))
@@ -235,7 +239,9 @@ which initiated this update."
                      (:td (:input :type "button" :id "move-e" :value "E" :class "action")))
                 (:tr (:td (:input :type "button" :id "move-sw" :value "SW" :class "action"))
                      (:td (:input :type "button" :id "move-s" :value "S" :class "action"))
-                     (:td (:input :type "button" :id "move-se" :value "SE" :class "action"))))))
+                     (:td (:input :type "button" :id "move-se" :value "SE" :class "action")))))
+	(:form :id "spellbox" :style "float: left"
+	       (:input :type "button" :id "proxiport" :value "proxiport" :class "action")))
        (:script :type "text/javascript"; TOOD: move this to a proper test suite
 		(cl-who:str
 		 (parenscript:ps
