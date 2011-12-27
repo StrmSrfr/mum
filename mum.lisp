@@ -42,7 +42,20 @@
               (take-turn turn player action)
               (error "turn not found"); TODO
               )
-          (action-prompt action action)))))
+          (action-prompt action player)))))
+
+(define-easy-handler quit ()
+  (setf (hunchentoot:content-type*) "text/html")
+  (let ((user (hunchentoot:session-value 'user)))
+    (delete-player *world* user))
+  (who-string
+    (:html
+     (:head
+      (:title "quit")
+      )
+     (:body
+      (:p "Smell you later")))))
+
 
 (define-easy-handler act ()
   (setf (hunchentoot:content-type*) "text/plain")

@@ -56,3 +56,7 @@
                                               :arena arena
                                               :clock 0)))
           (ensure-player (turn arena) player)))))
+
+(defmethod delete-player ((arena arena) (player player))
+  (setf (players arena)
+	(remove player (players arena))))

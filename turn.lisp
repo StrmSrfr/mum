@@ -82,6 +82,13 @@ when this turn ends.  Stored in reverse order (last message displayed is first i
                 (append (turns player)
                         (list turn)))))))
 
+(defmethod delete-player ((turn turn) (player player))
+  (delete-player (arena turn) player)
+  (setf (players turn)
+	(remove player (players turn))
+	(actions turn)
+	(remove player (actions turn) :key #'car)))
+
 (defun message-player (player turn message)
   (push (cons player message)
 	(messages turn)))

@@ -35,3 +35,9 @@
                             (players world)))))
           (ensure-player *valhalla* player)))))
 
+(defmethod delete-player ((world world) (player player))
+  (setf (players world)
+	(remove player (players world)))
+  (delete-player (first (last (turns player)))
+	  player))
+
