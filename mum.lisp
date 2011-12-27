@@ -272,7 +272,8 @@ which initiated this update."
            (cl-who:str (name
                         user)))
 	 (:th "HP: ")
-	 (:td :id "hp")))
+	 (:td :id "hp")
+	 (:td (:a :href "quit" "quit"))))
        (:p "Waiting on: "
 	   (:span :id "stragglers"
 		  "computers"))
