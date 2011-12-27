@@ -111,7 +111,7 @@
                :src "//ajax.googleapis.com/ajax/libs/jquery/1.6.0/jquery.min.js")
       (:style :type "text/css"
         "#clock { float: right }"
-        "#viewport { background-color: black; border: black; color: white; font-family: monospace; height: 24em; width: 80em; }"
+        "#viewport { background-color: black; border: black; color: white; font-family: monaco, monospace; font-size: 12px; height: 24em; width: 80em; }"
         "#viewport td { height: 1em; width: 1em; margin: 0; padding: 0; }"
         "#movebox table tr td input { height: 2.5em; width: 2.5em; } ")
       (:script :type "text/javascript"
