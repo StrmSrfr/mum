@@ -15,5 +15,5 @@
   ((name
     :initform "puny fists")
    (damage
-    :initform (make-instance 'xdy :x 1 :y 1))))
+    :initform (make-instance 'xdy :x 1 :y 2))))
     

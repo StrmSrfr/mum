@@ -114,8 +114,9 @@ representing an unrecognized action.")
 	(location (mapcar #'+
 			  (coordinates player)
 			  (cdr (assoc direction *directions*))))
-	(target (find location (players turn) :key 'coordinates :test #'equal)))
-    (deal-damage player target (roll (damage (first (weapons player)))))))
+	(target (find location (players turn) :key 'coordinates :test #'equal))
+	(weapon (first (weapons player))))
+    (deal-damage player target weapon (roll (damage weapon)))))
 
 (defmethod perform-action-5 (world player turn (verb (eql :move)) (arguments list))
   (let ((direction (quasi-intern (first arguments)
