@@ -215,6 +215,8 @@ which initiated this update."
                                    (update-handler value old-action old-arguments old-clock)))))
 
                   (defun act (action args clock)
+		    (ps:chain ($ "#talktext")
+			      (val ""))
                     (ps:chain ($ ".action")
                               (attr "disabled" t))
 		    (ps:chain ($ "#messages")
