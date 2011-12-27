@@ -59,4 +59,7 @@
 
 (defmethod delete-player ((arena arena) (player player))
   (setf (players arena)
-	(remove player (players arena))))
+	(remove player (players arena)))
+  (when (null (players arena))
+    (setf (turn arena)
+	  nil)))
