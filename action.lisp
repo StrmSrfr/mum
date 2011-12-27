@@ -21,7 +21,7 @@ representing an unrecognized action.")
     (format stream "~S ~S" (verb action) (arguments action))))
 
 (defparameter *action-verbs*
-  '(:talk :move :stay :proxiport)
+  '(:attack :talk :move :stay :proxiport)
   "All recognized action verbs.")
 
 (defun quasi-intern (string-designator symbol-list)
@@ -67,6 +67,20 @@ representing an unrecognized action.")
     (:N  . ( 0 -1 0))
     (:NE . ( 1 -1 0))))
 
+(defmethod action-prompt-3 (player (verb (eql :attack)) arguments)
+  (prompt-player player "Which direction?"
+		 (mapcar #'car
+			 *directions*)))
+
+(defmethod action-fully-specified-p-2 ((verb (eql :attack)) (arguments list))
+  "One argument: the direction.  Must be in *DIRECTIONS*."
+  (and
+   (= (length arguments) 1)
+   (let ((dir (quasi-intern (first arguments)
+			    (mapcar #'car *directions*))))
+     (assoc dir
+	    *directions*))))
+
 (defmethod action-fully-specified-p-2 ((verb (eql :move)) (arguments list))
   "One argument: the direction.  Must be in *DIRECTIONS*."
   (and
@@ -93,6 +107,15 @@ representing an unrecognized action.")
 
 (defun perform-action (world player turn action)
   (perform-action-5 world player turn (verb action) (arguments action)))
+
+(defmethod perform-action-5 (world player turn (verb (eql :attack)) (arguments list))
+  (let*((direction (quasi-intern (first arguments)
+				 (mapcar #'car *directions*)))
+	(location (mapcar #'+
+			  (coordinates player)
+			  (cdr (assoc direction *directions*))))
+	(target (find location (players turn) :key 'coordinates :test #'equal)))
+    (deal-damage player target (roll (damage (first (weapons player)))))))
 
 (defmethod perform-action-5 (world player turn (verb (eql :move)) (arguments list))
   (let ((direction (quasi-intern (first arguments)
