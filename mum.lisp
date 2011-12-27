@@ -172,6 +172,11 @@ which initiated this update."
                          (ps:chain ($ "#clock")
                                    (html clock))
                          (setf *clock* clock)))
+		      (:hp
+		       (ps:chain ($ "#hp")
+				 (html (+ (ps:@ update :arguments 0)
+					  "/"
+					  (ps:lisp (mhp user))))))
 		      (:stragglers
 		       (let*((stragglers (ps:@ update :arguments 0))
 			     (stragglers-string
@@ -241,9 +246,14 @@ which initiated this update."
                 ))))
      (:body
       (:div
-       (:p "Name: "
+       (:table
+	(:tr
+	 (:th "Name: ")
+	 (:td
            (cl-who:str (name
                         user)))
+	 (:th "HP: ")
+	 (:td :id "hp")))
        (:p "Waiting on: "
 	   (:span :id "stragglers"
 		  "computers"))

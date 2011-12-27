@@ -2,11 +2,9 @@
 
 (in-package #:mum)
 
-(defclass player (icon-mixin)
-  ((name
-   :accessor name
-   :initarg :name)
-   (icon
+(defclass player (damage-mixin icon-mixin)
+  (;name inherited from icon-mixin
+   (icon; inherited from icon-mixin
     :accessor icon
     :initarg :icon
     :initform +player-icon+)
@@ -18,6 +16,11 @@
     :initform nil
     :type list
     :documentation "The current prompt (if any).  TODO: this better")
+   (weapons
+    :accessor weapons
+    :initarg :weapons
+    :initform (list (make-instance 'puny-fists))
+    :type list)
    (turns
     :accessor turns
     :initarg :turns
