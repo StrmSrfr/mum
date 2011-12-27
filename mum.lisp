@@ -46,7 +46,11 @@
 
 (define-easy-handler quit ()
   (setf (hunchentoot:content-type*) "text/html")
-  (let ((user (hunchentoot:session-value 'user)))
+  (let*((user (hunchentoot:session-value 'user))
+	(turn (first (last (turns user)))))
+    (message-all-players turn
+			 (format nil "~A is a quitter!"
+				 (name user)))
     (delete-player *world* user))
   (who-string
     (:html
