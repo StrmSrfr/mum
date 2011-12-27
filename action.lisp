@@ -137,7 +137,9 @@ representing an unrecognized action.")
 	      (third (coordinates player)))))
 
 (defmethod perform-action-5 (world player turn (verb (eql :talk)) (arguments list))
-  (message-all-players turn (format nil "~A says \"~A\". (clock ~D)" (name player) (first arguments) (clock turn))))
+  (message-all-players turn (format nil "~A says \"~A\"."
+				    (name player)
+				    (cl-who:escape-string (first arguments)))))
 
 (defmethod perform-action-5 (world player turn (verb (eql :stay)) (arguments list))
   ; nop
