@@ -86,6 +86,10 @@ when this turn ends.  Stored in reverse order (last message displayed is first i
   (push (cons player message)
 	(messages turn)))
 
+(defun prompt-player (player question answers)
+  (setf (prompt player)
+	(cons question answers)))
+
 (defun message-all-players (turn message)
   (mapcar (lambda (player)
 	    (message-player player turn message))

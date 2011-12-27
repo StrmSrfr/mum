@@ -12,6 +12,12 @@
     :initform +player-icon+)
    (coordinates; inherited from position-mixin
     :initform (list (1+ (random 79)) (1+ (random 23)) 0))
+   (prompt
+    :accessor prompt
+    :initarg :prompt
+    :initform nil
+    :type list
+    :documentation "The current prompt (if any).  TODO: this better")
    (turns
     :accessor turns
     :initarg :turns

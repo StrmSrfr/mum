@@ -50,28 +50,37 @@
     (handle-action player
                    (json:decode-json-from-string
                     (caar (hunchentoot:post-parameters*))))
-    (json:encode-json-to-string
-     `(
-       ((:type . "icons")
-        (:arguments .
-                    ,(mapcar 'icon-json-alist
-                             (icons (arena (first (last (turns player))))))))
-       ,@(loop while (done-p (first (turns player)))
-              append (mapcar (lambda (text)
-                           `((:type . "message")
-                             (:arguments . (,text))))
-                         (reverse
-                          (mapcar #'cdr
-                                 (remove player (messages (pop (turns player))) :key #'car :test-not #'eq)))))
-      ((:type . "clock"); N.B. must be run after messages loop
-       (:arguments . (,(clock (first (turns player))))))
-      ((:type . "stragglers"); N.B. must be run after messages loop
-       (:arguments ,(mapcar 'name
-			    (mapcar #'car
-				    (remove-if 'eager-future2:ready-to-yield?
-					       (actions (first (turns player))); waiting turn
-					       :key #'cdr)))))
-       ))))
+    (if (prompt player)
+	(prog1
+	    (json:encode-json-to-string
+	     `(((:type . "prompt")
+		(:arguments ,@(prompt player)))))
+	     (setf (prompt player)
+		   nil))
+	(json:encode-json-to-string
+	 `(
+	   ((:type . "icons")
+	    (:arguments .
+			,(mapcar 'icon-json-alist
+				 (icons (arena (first (last (turns player))))))))
+	   ,@(loop while (done-p (first (turns player)))
+		append (mapcar (lambda (text)
+				 `((:type . "message")
+				   (:arguments . (,text))))
+			       (reverse
+				(mapcar #'cdr
+					(remove player (messages (pop (turns player))) :key #'car :test-not #'eq)))))
+	   ((:type . "clock"); N.B. must be run after messages loop
+	    (:arguments . (,(clock (first (turns player))))))
+	   ((:type . "hp")
+	    (:arguments ,(hp player)))
+	   ((:type . "stragglers"); N.B. must be run after messages loop
+	    (:arguments ,(mapcar 'name
+				 (mapcar #'car
+					 (remove-if 'eager-future2:ready-to-yield?
+						    (actions (first (turns player))); waiting turn
+						    :key #'cdr)))))
+	   )))))
 
 (define-easy-handler login (name)
   (let ((player (ensure-player *world* name)))
@@ -120,10 +129,34 @@
 		    (ps:chain ($ (coordinate-id (ps:@ icon coordinates)))
 			      (html (ps:@ icon old-html))))
 
+		  (defun rest (array) ; TODO CHEAP
+		    (ps:chain array (slice 1)))
+
                   (defun update-handler (update old-action old-arguments old-clock)
                     "The action, arguments, and clock  are those that were taken
 which initiated this update."
                     (case (ps:@ update type)
+		      (:prompt
+		       (ps:chain ($ "#messages")
+				 (append
+				  (ps:who-ps-html
+				   (:form
+				    (:span :id "prompt"
+					    (ps:@ update :arguments 0))))))
+		       (mapcar (lambda (choice)
+				 (ps:chain ($ "#prompt")
+					   (append
+					    (ps:who-ps-html
+					     (:input :type "button" :value choice)))))
+				   (rest (ps:@ update :arguments)))
+		       (ps:chain ($ "#prompt input")
+				 (click (lambda ()
+					  (when (null old-arguments)
+					    (setf old-arguments (list)))
+					  (act old-action (append old-arguments
+								  (ps:chain ($ this) (val)))
+					       old-clock)
+					  ps:f))))
                       (:message
                        (ps:chain ($ "#messages")
                               (append (+ "<p>" (ps:@ update :arguments 0)
