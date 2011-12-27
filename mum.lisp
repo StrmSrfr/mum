@@ -96,7 +96,7 @@
 	   )))))
 
 (define-easy-handler login (name)
-  (let ((player (ensure-player *world* name)))
+  (let ((player (ensure-player *world* (who:escape-string name))))
     (setf (hunchentoot:session-value 'user) player)
     (hunchentoot:redirect "/mum/view")))
 
