@@ -21,6 +21,11 @@
     :initarg :weapons
     :initform (list (make-instance 'puny-fists))
     :type list)
+   (level
+    :accessor level
+    :initarg :level
+    :initform 1
+    :type integer)
    (turns
     :accessor turns
     :initarg :turns

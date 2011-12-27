@@ -271,6 +271,9 @@ which initiated this update."
 	 (:td
            (cl-who:str (name
                         user)))
+	 (:th "Level: ")
+	 (:td :id "level"
+	      (cl-who:str (level user)))
 	 (:th "HP: ")
 	 (:td :id "hp")
 	 (:td (:a :href "quit" "quit"))))
