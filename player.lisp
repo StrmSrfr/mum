@@ -41,3 +41,5 @@ the list is the turn currently being taken.")))
 (defmethod clock ((player player))
   (clock (first (last (turns player)))))
 
+(defmethod arena ((player player))
+  (arena (first (last (turns player)))))

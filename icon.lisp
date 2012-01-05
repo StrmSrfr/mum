@@ -21,6 +21,9 @@
 (defparameter +wall-icon+
   (make-instance 'icon :glyph "#" :tooltip "a wall"))
 
+(defparameter +rubble-icon+
+  (make-instance 'icon :glyph ";" :tooltip "a pile of rocks"))
+
 (defun string-hash-color (string)
   (let ((result-gbr (make-array 3 :initial-element 128)))
     (loop for c across string

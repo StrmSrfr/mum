@@ -308,7 +308,8 @@ which initiated this update."
                      (:td (:input :type "button" :id "move-se" :value "SE" :class "action")))))
 	(:form :id "spellbox" :style "float: left"
 	       (:input :type "button" :id "proxiport" :value "proxiport" :class "action")
-	       (:input :type "button" :id "attack" :value "attack" :class "action")))
+	       (:input :type "button" :id "attack" :value "attack" :class "action")
+	       (:input :type "button" :id "build" :value "build" :class "action")))
        (:script :type "text/javascript"; TOOD: move this to a proper test suite
 		(cl-who:str
 		 (parenscript:ps
