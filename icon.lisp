@@ -15,6 +15,12 @@
     :accessor tooltip
     :initarg :tooltip)))
 
+(defparameter +closed-door-icon+
+  (make-instance 'icon :glyph "+" :tooltip "a closed door"))
+
+(defparameter +open-door-icon+
+  (make-instance 'icon :glyph "'" :tooltip "an open door"))
+
 (defparameter +player-icon+
   (make-instance 'icon :glyph "p" :tooltip "somebody"))
 

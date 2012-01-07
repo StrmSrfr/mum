@@ -1,5 +1,6 @@
 ;;;; package.lisp
 
 (defpackage #:mum
-  (:use #:cl))
+  (:use #:cl #:parenscript)
+  (:shadow close open))
 
