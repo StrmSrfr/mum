@@ -148,8 +148,8 @@
 			   (who-ps-html
 			    (:div :class "details"
 				  (ps:chain ($ (@ icon html)) (attr "title"))))))
-		      (ps:chain ($ details)
-				(append-to "body"))
+		      (ps:chain ($ "body")
+				(append details))
 		      (position-details event)
 		      nil))
 
