@@ -141,13 +141,13 @@
 			  (y (+ (ps:chain ($ target) (position) top)
 				(ps:chain target client-height))))
 		      (ps:chain ($ "div.details")
-				(css (create position "absolute" "top" y "left" x)))))
+				(css (create :position :absolute :top y :left x)))))
 
 		  (defun show-details (event icon)
 		    (let ((details
-			   (+ "<div class=\"details\">"
-			      (ps:chain ($ (@ icon html)) (attr "title"))
-			      "</div>")))
+			   (who-ps-html
+			    (:div :class "details"
+				  (ps:chain ($ (@ icon html)) (attr "title"))))))
 		      (ps:chain ($ details)
 				(append-to "body"))
 		      (position-details event)
