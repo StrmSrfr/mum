@@ -119,7 +119,7 @@
         "#viewport td { height: 1em; width: 1em; margin: 0; padding: 0; }"
         "#movebox table tr td input { height: 2.5em; width: 2.5em; } ")
       (:script :type "text/javascript"
-               (cl-who:str (ps:ps* ps:*ps-lisp-library*)))
+               :src "ps-lisp-library.js")
       (:script :type "text/javascript"
                (cl-who:str
                 (parenscript:ps

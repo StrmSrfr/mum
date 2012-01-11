@@ -144,7 +144,6 @@ representing an unrecognized action.")
   "No arguments."
   t)
 
-
 (defgeneric perform-action-5 (world player turn verb arguments))
 
 (defun perform-action (world player turn action)
