@@ -7,7 +7,7 @@
   (every #'= (coordinates o1) (coordinates o2)))
 
 (defmethod collide ((player player) (arena arena) (direction symbol) (turn turn))
-  (loop for target in (remove player (icons arena)); TODO: collision with other things
+  (loop for target in (remove player (entities arena))
      when (and (collide-p player target direction turn)
 	       (collide-p target player direction turn))
      do (collide player target direction turn)))

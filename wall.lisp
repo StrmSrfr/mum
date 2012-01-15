@@ -2,7 +2,7 @@
 
 (in-package #:mum)
 
-(defclass wall (icon-mixin)
+(defclass wall (entity)
   ((name; inherited from icon-mixin
     :initform "a wall")
    (icon; inherited from icon-mixin

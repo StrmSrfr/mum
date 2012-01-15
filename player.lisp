@@ -2,7 +2,7 @@
 
 (in-package #:mum)
 
-(defclass player (damage-mixin icon-mixin)
+(defclass player (entity)
   (;name inherited from icon-mixin
    (icon; inherited from icon-mixin
     :accessor icon

@@ -79,7 +79,7 @@
 	   ((:type . "icons")
 	    (:arguments .
 			,(mapcar 'icon-json-alist
-				 (icons (arena (first (last (turns player))))))))
+				 (entities (arena (first (last (turns player))))))))
 	   ,@(loop while (done-p (first (turns player)))
 		append (mapcar (lambda (text)
 				 `((:type . "message")

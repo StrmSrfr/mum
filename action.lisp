@@ -155,7 +155,7 @@ representing an unrecognized action.")
 	(location (mapcar #'+
 			  (coordinates player)
 			  (cdr (assoc direction *directions*))))
-	(target (find location (players turn) :key 'coordinates :test #'equal))
+	(target (find location (entities turn) :key 'coordinates :test #'equal))
 	(weapon (first (weapons player))))
     (deal-damage player target weapon (roll (damage weapon)))))
 
@@ -165,7 +165,7 @@ representing an unrecognized action.")
 	(location (mapcar #'+
 			  (coordinates player)
 			  (cdr (assoc direction *directions*))))
-	(target (find location (walls (arena turn)) :key 'coordinates :test #'equal)))
+	(target (find location (entities (arena turn)) :key 'coordinates :test #'equal)))
     (cond
       ((null target)
        (message-player player turn "You try to open the darkness, but in vain."))
@@ -182,7 +182,7 @@ representing an unrecognized action.")
 	(location (mapcar #'+
 			  (coordinates player)
 			  (cdr (assoc direction *directions*))))
-	(target (find location (walls (arena turn)) :key 'coordinates :test #'equal)))
+	(target (find location (entities (arena turn)) :key 'coordinates :test #'equal)))
     (cond
       ((null target)
        (message-player player turn "You try to close the darkness, but in vain."))
@@ -200,7 +200,7 @@ representing an unrecognized action.")
 			  (coordinates player)
 			  (cdr (assoc direction *directions*)))))
     (push (make-instance 'wall :icon +rubble-icon+ :coordinates location)
-	  (walls (arena player)))))
+	  (entities (arena player)))))
 
 (defmethod perform-action-5 (world player turn (verb (eql :move)) (arguments list))
   (let ((direction (quasi-intern (first arguments)

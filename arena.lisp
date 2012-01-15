@@ -7,17 +7,12 @@
     :accessor name
     :initarg :name
     :documentation "Name of this arena (for humans).  Need not be unique.")
-   (players
-    :accessor players
-    :initarg :players
+   (entities
+    :accessor entities
+    :initarg :entities
     :initform nil
     :type list
-    :documentation "Players in this arena.")
-   (walls
-    :accessor walls
-    :initarg :walls
-    :initform nil
-    :type list)
+    :documentation "Entities (players, walls, ...) in this arena.")
    (turn
     :accessor turn
     :initarg :turn
@@ -29,8 +24,13 @@
   (print-unreadable-object (arena stream :type t :identity t)
     (format stream "~S" (name arena))))
 
-(defmethod icons ((arena arena))
-  (append (players arena) (walls arena)))
+(defmethod players ((arena arena))
+  (remove-if-not (rcurry #'typep 'player)
+		 (entities arena)))
+
+(defmethod walls ((arena arena))
+  (remove-if-not (rcurry #'typep 'wall)
+		 (entities arena)))
 
 (defun make-valhalla ()
   (let ((valhalla (make-instance 'arena
@@ -41,7 +41,7 @@
 		      (member y '(1 24)))
 	     do (push (make-instance 'wall
 				     :coordinates (list x y 0))
-		      (walls valhalla))))
+		      (entities valhalla))))
     valhalla))
 
 (defvar *valhalla*
@@ -49,8 +49,8 @@
 
 (defmethod ensure-player ((arena arena) (player player) &rest ignored?)
   (the player
-    (or (find player (players arena))
-        (let ((player (first (push player (players arena)))))
+    (or (find player (entities arena))
+        (let ((player (first (push player (entities arena)))))
           (unless (turn arena)
             (setf (turn arena) (make-instance 'turn
                                               :arena arena
@@ -58,8 +58,8 @@
           (ensure-player (turn arena) player)))))
 
 (defmethod delete-player ((arena arena) (player player))
-  (setf (players arena)
-	(remove player (players arena)))
+  (setf (entities arena)
+	(remove player (entities arena)))
   (when (null (players arena))
     (setf (turn arena)
 	  nil)))
