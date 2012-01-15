@@ -117,7 +117,8 @@
         "#clock { float: right }"
         "#viewport { background-color: black; border: black; color: white; font-family: monaco, monospace; font-size: 12px; height: 24em; width: 80em; }"
         "#viewport td { height: 1em; width: 1em; margin: 0; padding: 0; }"
-        "#movebox table tr td input { height: 2.5em; width: 2.5em; } ")
+        "#movebox table tr td input { height: 2.5em; width: 2.5em; } "
+        "div.details { background-color: white; border: 1px solid black; padding: 8px; }")
       (:script :type "text/javascript"
                :src "ps-lisp-library.js")
       (:script :type "text/javascript"
@@ -133,12 +134,42 @@
 		       "-"
 		       (ps:@ coordinates 1)))
 
+		  (defun position-details (event)
+		    (let*((target (ps:chain event current-target))
+			  (x (+ (ps:chain ($ target) (position) left)
+				(ps:chain target client-width)))
+			  (y (+ (ps:chain ($ target) (position) top)
+				(ps:chain target client-height))))
+		      (ps:chain ($ "div.details")
+				(css (create :position :absolute :top y :left x)))))
+
+		  (defun show-details (event icon)
+		    (let ((details
+			   (who-ps-html
+			    (:div :class "details"
+				  (ps:chain ($ (@ icon html)) (attr "title"))))))
+		      (ps:chain ($ "body")
+				(append details))
+		      (position-details event)
+		      nil))
+
+		  (defun hide-details (event)
+		    (ps:chain ($ "div.details")
+			      (remove)))
+
                   (defun draw-icon (icon)
                     (when (= 0 (ps:@ icon coordinates 2))
 		      (let ((id (coordinate-id (ps:@ icon coordinates))))
 			(setf (ps:@ icon old-html)
 			      (ps:chain ($ id)
 					(html)))
+			(ps:chain ($ id)
+				  (mouseover
+				   (lambda (event)
+				     (show-details event icon)))
+				  (mouseout
+				   (lambda (event)
+				     (hide-details event))))
 			(ps:chain ($ id)
 				  (html (ps:@ icon html))))))
 
