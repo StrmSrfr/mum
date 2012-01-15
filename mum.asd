@@ -24,7 +24,7 @@
                (:file "icon" :depends-on ("package"))
                (:file "icon-mixin" :depends-on ("package" "icon" "position-mixin"))
 	       (:file "openable" :depends-on ("icon-mixin"))
-	       (:file "parenscript.lisp" :depends-on ("package"))
+	       (:file "parenscript" :depends-on ("package"))
                (:file "position-mixin" :depends-on ("package"))
                (:file "turn" :depends-on ("package" "generics" "player"))
                (:file "player" :depends-on ("package" "damage-mixin" "icon-mixin"))
