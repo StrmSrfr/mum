@@ -32,20 +32,7 @@
   (remove-if-not (rcurry #'typep 'wall)
 		 (entities arena)))
 
-(defun make-valhalla ()
-  (let ((valhalla (make-instance 'arena
-				:name "Valhalla")))
-    (loop for y from 1 to 24
-       do (loop for x from 1 to 80
-	     when (or (member x '(1 80))
-		      (member y '(1 24)))
-	     do (push (make-instance 'wall
-				     :coordinates (list x y 0))
-		      (entities valhalla))))
-    valhalla))
 
-(defvar *valhalla*
-  (make-valhalla))
 
 (defmethod ensure-player ((arena arena) (player player) &rest ignored?)
   (the player

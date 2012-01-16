@@ -2,6 +2,6 @@
 
 (defpackage #:mum
   (:use #:cl #:parenscript)
-  (:import-from #:alexandria #:curry #:rcurry)
+  (:import-from #:alexandria #:compose #:curry #:rcurry)
   (:shadow close open))
 
