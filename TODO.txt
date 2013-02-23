@@ -1,0 +1,6 @@
+* players incarnate
+* players move
+* players attack each other with weapons
+* players die
+* players gain or lose valuable life lessons
+* players reincarnate
